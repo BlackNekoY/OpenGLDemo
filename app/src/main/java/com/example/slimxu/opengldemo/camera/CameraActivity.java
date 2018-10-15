@@ -1,5 +1,6 @@
 package com.example.slimxu.opengldemo.camera;
 
+import android.opengl.Matrix;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -22,19 +23,20 @@ public class CameraActivity extends AppCompatActivity {
         mGLSurfaceView = (CameraGLSurfaceView)findViewById(R.id.surface_view);
     }
 
+    // TODO 这里的前进后退得考虑相机的front
     public void goForward(View view) {
-        mGLSurfaceView.mCameraMoveZValue -= 0.5f;
+        mGLSurfaceView.mCameraPos.z -= 0.5f;
     }
 
     public void backUp(View view) {
-        mGLSurfaceView.mCameraMoveZValue += 0.5f;
+        mGLSurfaceView.mCameraPos.z += 0.5f;
     }
 
     public void goLeft(View view) {
-        mGLSurfaceView.mCameraMoveXValue -= 0.5f;
+        mGLSurfaceView.mCameraPos.x -= 0.5f;
     }
 
     public void goRight(View view) {
-        mGLSurfaceView.mCameraMoveXValue += 0.5f;
+        mGLSurfaceView.mCameraPos.x += 0.5f;
     }
 }

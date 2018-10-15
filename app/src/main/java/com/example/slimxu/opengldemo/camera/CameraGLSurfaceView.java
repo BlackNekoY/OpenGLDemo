@@ -9,6 +9,8 @@ import android.opengl.Matrix;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
+import android.view.View;
 
 import com.example.slimxu.opengldemo.GLUtil;
 import com.example.slimxu.opengldemo.R;
@@ -71,17 +73,17 @@ public class CameraGLSurfaceView extends GLSurfaceView implements GLSurfaceView.
             -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
     };
 
-    private final Position[] CUBE_POSITIONS = {
-            new Position(0.0f,  0.0f,  0.0f),
-            new Position( 2.0f,  5.0f, -15.0f),
-            new Position(-1.5f, -2.2f, -2.5f),
-            new Position(-3.8f, -2.0f, -12.3f),
-            new Position(2.4f, -0.4f, -3.5f),
-            new Position(-1.7f,  3.0f, -7.5f),
-            new Position(1.3f, -2.0f, -2.5f),
-            new Position(1.5f,  2.0f, -2.5f),
-            new Position(1.5f,  0.2f, -1.5f),
-            new Position(-1.3f,  1.0f, -1.5f)
+    private final Vector[] CUBE_POSITIONS = {
+            new Vector(0.0f,  0.0f,  0.0f),
+            new Vector( 2.0f,  5.0f, -15.0f),
+            new Vector(-1.5f, -2.2f, -2.5f),
+            new Vector(-3.8f, -2.0f, -12.3f),
+            new Vector(2.4f, -0.4f, -3.5f),
+            new Vector(-1.7f,  3.0f, -7.5f),
+            new Vector(1.3f, -2.0f, -2.5f),
+            new Vector(1.5f,  2.0f, -2.5f),
+            new Vector(1.5f,  0.2f, -1.5f),
+            new Vector(-1.3f,  1.0f, -1.5f)
     } ;
 
     private FloatBuffer mVertexBuf;
@@ -135,9 +137,17 @@ public class CameraGLSurfaceView extends GLSurfaceView implements GLSurfaceView.
     // 摄像机旋转的半径
     private float mCameraRotateRadius = 10f;
 
-    public float mCameraMoveXValue = 0;    // 摄像机在X方向上移动的距离
-    public float mCameraMoveYValue = 0;
-    public float mCameraMoveZValue = 0;
+    // 摄像机位置向量
+    public Vector mCameraPos = new Vector(0, 0, 3);
+    // 摄像机前方向量
+    public Vector mCameraFront = new Vector(0, 0, -1);
+    // 摄像机up向量
+    public Vector mCameraUp = new Vector(0, 1, 0);
+
+    private float mLastTouchX;
+    private float mLastTouchY;
+    private float mYawValue = -90f; // Yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right (due to how Eular angles work) so we initially rotate a bit to the left.
+    private float mPitchValue;
 
     private Handler mHandler = new Handler() {
         @Override
@@ -158,11 +168,59 @@ public class CameraGLSurfaceView extends GLSurfaceView implements GLSurfaceView.
         init();
     }
 
+
+
     private void init() {
         mVertexBuf = array2FloatBuffer(VERTEX_ARRAY);
         setEGLContextClientVersion(3);
         setRenderer(this);
         setRenderMode(RENDERMODE_WHEN_DIRTY);
+
+        setOnTouchListener(new OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                float x = event.getX();
+                float y = event.getY();
+
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        mLastTouchX = x;
+                        mLastTouchY = y;
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        float disX = x - mLastTouchX;
+                        float disY = mLastTouchY - y;
+
+                        mLastTouchX = x;
+                        mLastTouchY = y;
+
+                        float sensitivity = 0.05f;
+                        disX *= sensitivity;
+                        disY *= sensitivity;
+
+                        mYawValue += disX;
+                        mPitchValue += disY;
+                        if (mPitchValue > 89.0f) {
+                            mPitchValue = 89.0f;
+                        }
+                        if (mPitchValue < -89.0f) {
+                            mPitchValue = -89.0f;
+                        }
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        break;
+                }
+
+                // 摄像机前方的向量(通过手指XY方向移动的距离，算欧拉角，然后得出摄像机前方向量)
+                float yawRadians = (float) Math.toRadians(mYawValue);
+                float pitchRadians = (float) Math.toRadians(mPitchValue);
+                mCameraFront.x = (float) (Math.cos(yawRadians) * Math.cos(pitchRadians));
+                mCameraFront.y = (float) Math.sin(pitchRadians);
+                mCameraFront.z = (float) (Math.sin(yawRadians) * Math.cos(pitchRadians));
+
+                return true;
+            }
+        });
     }
 
     private FloatBuffer array2FloatBuffer(float[] array) {
@@ -264,13 +322,10 @@ public class CameraGLSurfaceView extends GLSurfaceView implements GLSurfaceView.
 
         // 设置观察矩阵(摄像机矩阵)
         Matrix.setIdentityM(mViewMatrix, 0);
-//        float camX = (float) (Math.sin(mCameraRotateValue) * mCameraRotateRadius);
-//        float camZ = (float) (Math.cos(mCameraRotateValue) * mCameraRotateRadius);
-
         Matrix.setLookAtM(mViewMatrix, 0,
-                mCameraMoveXValue, mCameraMoveYValue, 5 + mCameraMoveZValue,
-                mCameraMoveXValue, mCameraMoveYValue, 5 + mCameraMoveZValue - 1,
-                0, 1, 0);
+                mCameraPos.x, mCameraPos.y, mCameraPos.z,
+                mCameraPos.x + mCameraFront.x, mCameraPos.y + mCameraFront.y, mCameraPos.z + mCameraFront.z,
+                mCameraUp.x, mCameraUp.y, mCameraUp.z);
         GLES30.glUniformMatrix4fv(mViewMatrixHandle, 1, false, mViewMatrix, 0);
 
         // 设置投影矩阵
@@ -293,17 +348,16 @@ public class CameraGLSurfaceView extends GLSurfaceView implements GLSurfaceView.
 
     }
 
-    private static class Position {
-        public final float x;
-        public final float y;
+    public static class Vector {
+        public float x;
+        public float y;
+        public float z;
 
-        public Position(float x, float y, float z) {
+        public Vector(float x, float y, float z) {
             this.x = x;
             this.y = y;
             this.z = z;
         }
-
-        public final float z;
 
 
     }
