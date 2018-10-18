@@ -4,6 +4,10 @@ import android.content.Context;
 import android.opengl.GLES30;
 import android.util.Log;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
+
 /**
  * Created by slimxu on 2018/9/29.
  */
@@ -33,5 +37,16 @@ public class GLUtil {
 
         return program;
     }
+
+    public static FloatBuffer array2FloatBuffer(float[] array) {
+        FloatBuffer floatBuffer = ByteBuffer.allocateDirect(array.length * 4)
+                .order(ByteOrder.nativeOrder())
+                .asFloatBuffer()
+                .put(array);
+        floatBuffer.position(0);
+        return floatBuffer;
+    }
+
+
 
 }

@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
+import com.example.slimxu.opengldemo.GLCamera;
 import com.example.slimxu.opengldemo.R;
 
 /**
@@ -25,18 +26,18 @@ public class CameraActivity extends AppCompatActivity {
 
     // TODO 这里的前进后退得考虑相机的front
     public void goForward(View view) {
-        mGLSurfaceView.mCameraPos.z -= 0.5f;
+        mGLSurfaceView.mCamera.processKeyboardMovement(GLCamera.Direction.FORWARD, 0.5f);
     }
 
     public void backUp(View view) {
-        mGLSurfaceView.mCameraPos.z += 0.5f;
+        mGLSurfaceView.mCamera.processKeyboardMovement(GLCamera.Direction.BACKWARD, 0.5f);
     }
 
     public void goLeft(View view) {
-        mGLSurfaceView.mCameraPos.x -= 0.5f;
+        mGLSurfaceView.mCamera.processKeyboardMovement(GLCamera.Direction.LEFT, 0.5f);
     }
 
     public void goRight(View view) {
-        mGLSurfaceView.mCameraPos.x += 0.5f;
+        mGLSurfaceView.mCamera.processKeyboardMovement(GLCamera.Direction.RIGHT, 0.5f);
     }
 }

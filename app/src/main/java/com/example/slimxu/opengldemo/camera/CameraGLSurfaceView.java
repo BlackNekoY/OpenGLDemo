@@ -12,8 +12,10 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.example.slimxu.opengldemo.GLCamera;
 import com.example.slimxu.opengldemo.GLUtil;
 import com.example.slimxu.opengldemo.R;
+import com.example.slimxu.opengldemo.Vector;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -119,7 +121,7 @@ public class CameraGLSurfaceView extends GLSurfaceView implements GLSurfaceView.
     private int mPosHandle;
     private int mTexPosHandle;
     private int mTransformMatrixHandle;
-    private int mModelMatrixHandle;;
+    private int mModelMatrixHandle;
     private int mViewMatrixHandle;
     private int mProjectionHandle;
 
@@ -129,30 +131,18 @@ public class CameraGLSurfaceView extends GLSurfaceView implements GLSurfaceView.
     private int VAO;
 
     private float[] mModelMatrix = new float[16];   // 模型矩阵
-    private float[] mViewMatrix = new float[16];    // 观察矩阵
+//    private float[] mViewMatrix = new float[16];    // 观察矩阵
     private float[] mProjectionMatrix = new float[16];    // 投影矩阵
 
-    // 摄像机旋转的角度
-    private float mCameraRotateValue = 0f;
-    // 摄像机旋转的半径
-    private float mCameraRotateRadius = 10f;
 
-    // 摄像机位置向量
-    public Vector mCameraPos = new Vector(0, 0, 3);
-    // 摄像机前方向量
-    public Vector mCameraFront = new Vector(0, 0, -1);
-    // 摄像机up向量
-    public Vector mCameraUp = new Vector(0, 1, 0);
+    public GLCamera mCamera ;
 
     private float mLastTouchX;
     private float mLastTouchY;
-    private float mYawValue = -90f; // Yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right (due to how Eular angles work) so we initially rotate a bit to the left.
-    private float mPitchValue;
 
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-//            mCameraRotateValue += 0.05f;
             mHandler.sendEmptyMessageDelayed(1, 16);
             requestRender();
         }
@@ -176,6 +166,8 @@ public class CameraGLSurfaceView extends GLSurfaceView implements GLSurfaceView.
         setRenderer(this);
         setRenderMode(RENDERMODE_WHEN_DIRTY);
 
+        mCamera = new GLCamera(new Vector(0, 0, 3));
+
         setOnTouchListener(new OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -191,33 +183,14 @@ public class CameraGLSurfaceView extends GLSurfaceView implements GLSurfaceView.
                         float disX = x - mLastTouchX;
                         float disY = mLastTouchY - y;
 
+                        mCamera.processPointerMovement(disX, disY);
+
                         mLastTouchX = x;
                         mLastTouchY = y;
-
-                        float sensitivity = 0.05f;
-                        disX *= sensitivity;
-                        disY *= sensitivity;
-
-                        mYawValue += disX;
-                        mPitchValue += disY;
-                        if (mPitchValue > 89.0f) {
-                            mPitchValue = 89.0f;
-                        }
-                        if (mPitchValue < -89.0f) {
-                            mPitchValue = -89.0f;
-                        }
                         break;
                     case MotionEvent.ACTION_UP:
                         break;
                 }
-
-                // 摄像机前方的向量(通过手指XY方向移动的距离，算欧拉角，然后得出摄像机前方向量)
-                float yawRadians = (float) Math.toRadians(mYawValue);
-                float pitchRadians = (float) Math.toRadians(mPitchValue);
-                mCameraFront.x = (float) (Math.cos(yawRadians) * Math.cos(pitchRadians));
-                mCameraFront.y = (float) Math.sin(pitchRadians);
-                mCameraFront.z = (float) (Math.sin(yawRadians) * Math.cos(pitchRadians));
-
                 return true;
             }
         });
@@ -321,16 +294,11 @@ public class CameraGLSurfaceView extends GLSurfaceView implements GLSurfaceView.
 
 
         // 设置观察矩阵(摄像机矩阵)
-        Matrix.setIdentityM(mViewMatrix, 0);
-        Matrix.setLookAtM(mViewMatrix, 0,
-                mCameraPos.x, mCameraPos.y, mCameraPos.z,
-                mCameraPos.x + mCameraFront.x, mCameraPos.y + mCameraFront.y, mCameraPos.z + mCameraFront.z,
-                mCameraUp.x, mCameraUp.y, mCameraUp.z);
-        GLES30.glUniformMatrix4fv(mViewMatrixHandle, 1, false, mViewMatrix, 0);
+        GLES30.glUniformMatrix4fv(mViewMatrixHandle, 1, false, mCamera.getViewMatrix(), 0);
 
         // 设置投影矩阵
         Matrix.setIdentityM(mProjectionMatrix, 0);
-        Matrix.perspectiveM(mProjectionMatrix, 0, 45f, (float)mWidth / mHeight, 0.1f, 100f);
+        Matrix.perspectiveM(mProjectionMatrix, 0, mCamera.zoom, (float)mWidth / mHeight, 0.1f, 100f);
         GLES30.glUniformMatrix4fv(mProjectionHandle, 1, false, mProjectionMatrix, 0);
 
         // VAO
@@ -345,20 +313,6 @@ public class CameraGLSurfaceView extends GLSurfaceView implements GLSurfaceView.
             GLES30.glDrawArrays(GLES30.GL_TRIANGLES, 0, 36);
         }
         GLES30.glBindVertexArray(0);
-
-    }
-
-    public static class Vector {
-        public float x;
-        public float y;
-        public float z;
-
-        public Vector(float x, float y, float z) {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-        }
-
 
     }
 }
