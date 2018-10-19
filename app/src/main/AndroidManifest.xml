@@ -20,6 +20,7 @@
         <activity android:name=".texture.TextureActivity"/>
         <activity android:name=".coordinate.CoordinateActivity"/>
         <activity android:name=".camera.CameraActivity"/>
+        <activity android:name=".light.LightActivity"/>
     </application>
 
     <uses-feature

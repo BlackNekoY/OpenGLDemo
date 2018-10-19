@@ -19,6 +19,7 @@ public class GLCamera {
     public float zoom;
     private float sensitivty;
 
+    // 摄像机的4个关键向量
     private Vector position;
     private Vector front;
     private Vector up;

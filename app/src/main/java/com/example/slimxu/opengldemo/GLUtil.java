@@ -30,7 +30,8 @@ public class GLUtil {
         int[] status = new int[1];
         GLES30.glGetProgramiv(program, GLES30.GL_LINK_STATUS, status, 0);
         if (status[0] != GLES30.GL_TRUE) {
-            Log.e("GLUtil", "can not link program");
+            Log.e("GLUtil", "can not link program, vertexShader error : " +   GLES30.glGetShaderInfoLog(vertexShaderId));
+            Log.e("GLUtil", "can not link program, fragmentShader error : " + GLES30.glGetShaderInfoLog(fragmentShaderId));
             GLES30.glDeleteProgram(program);
             program = -1;
         }

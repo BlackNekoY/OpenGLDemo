@@ -24,7 +24,6 @@ public class CameraActivity extends AppCompatActivity {
         mGLSurfaceView = (CameraGLSurfaceView)findViewById(R.id.surface_view);
     }
 
-    // TODO 这里的前进后退得考虑相机的front
     public void goForward(View view) {
         mGLSurfaceView.mCamera.processKeyboardMovement(GLCamera.Direction.FORWARD, 0.5f);
     }
