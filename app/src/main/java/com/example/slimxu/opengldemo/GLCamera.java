@@ -104,6 +104,10 @@ public class GLCamera {
         }
     }
 
+    public Vector getPosition() {
+        return new Vector(position);
+    }
+
     /**
      * 更新摄像机的三个向量，front,up,right
      */
