@@ -106,10 +106,10 @@ public class LightGLSurfaceView extends GLSurfaceView implements GLSurfaceView.R
             "   float diff = max(dot(norm, lightDir), 0.0f); // 散射因子 \n" +
             "   vec3 diffuse = lightColor * diff;    // 散射光照 \n" +
 
-            "   float specularStrength = 0.5f; \n" +
+            "   float specularStrength = 0.5f;  // 镜面强度 \n" +
             "   vec3 viewDir = normalize(viewPos - FragPos); // 观察向量\n" +
-            "   vec3 reflectDir = reflect(-lightDir, norm); \n" +
-            "   float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);  \n" +
+            "   vec3 reflectDir = reflect(-lightDir, norm);  // 反射向量\n" +
+            "   float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);  // 镜面亮度分量， 32是物体的发光值，发光值越高，反射光的能力越强\n" +
             "   vec3 specular = specularStrength * spec * lightColor; // 镜面光照\n" +
 
             "   vec3 finalLightColor = ambient + diffuse + specular; \n" +
@@ -151,8 +151,8 @@ public class LightGLSurfaceView extends GLSurfaceView implements GLSurfaceView.R
     private float mLastTouchX;
     private float mLastTouchY;
 
-    private Vector mObjectPos = new Vector(0.5f, 0.5f, 0.5f);
-    private Vector mLightPos = new Vector(1.2f, 1.0f, 2.0f);
+    private Vector mObjectPos = new Vector(0f, 0f, 0f);
+    private Vector mLightPos = new Vector(1f, 0f, 3f);
 
     public LightGLSurfaceView(Context context) {
         super(context);
@@ -310,6 +310,8 @@ public class LightGLSurfaceView extends GLSurfaceView implements GLSurfaceView.R
         Matrix.setIdentityM(mModelMatrix, 0);
         Matrix.translateM(mModelMatrix, 0, mLightPos.x, mLightPos.y, mLightPos.z);
         Matrix.scaleM(mModelMatrix, 0, 0.2f, 0.2f, 0.2f);
+        Matrix.rotateM(mModelMatrix, 0, 30, 0, 1, 0);
+        Matrix.rotateM(mModelMatrix, 0, 30, 1, 0, 0);
         GLES30.glUniformMatrix4fv(unifModelPointer, 1, false, mModelMatrix, 0);
 
         // view
