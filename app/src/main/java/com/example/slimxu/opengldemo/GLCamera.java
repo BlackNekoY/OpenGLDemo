@@ -6,7 +6,7 @@ import android.opengl.Matrix;
 public class GLCamera {
 
     public enum Direction {
-        FORWARD, BACKWARD, LEFT, RIGHT
+        FORWARD, BACKWARD, LEFT, RIGHT, UP, DOWN
     }
 
     private static final float YAW = -90;   // X轴偏航角
@@ -101,6 +101,14 @@ public class GLCamera {
             position.x += crossVector.x * offset;
             position.y += crossVector.y * offset;
             position.z += crossVector.z * offset;
+        } else if (direction == Direction.UP) {
+            position.x += up.x * offset;
+            position.y += up.y * offset;
+            position.z += up.z * offset;
+        } else if (direction == Direction.DOWN) {
+            position.x -= up.x * offset;
+            position.y -= up.y * offset;
+            position.z -= up.z * offset;
         }
     }
 

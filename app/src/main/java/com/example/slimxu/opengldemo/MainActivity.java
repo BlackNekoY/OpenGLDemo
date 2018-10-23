@@ -15,6 +15,7 @@ import com.example.slimxu.opengldemo.camera.CameraActivity;
 import com.example.slimxu.opengldemo.coordinate.CoordinateActivity;
 import com.example.slimxu.opengldemo.light.LightActivity;
 import com.example.slimxu.opengldemo.light_material.LightMaterialActivity;
+import com.example.slimxu.opengldemo.light_texture.LightTextureActivity;
 import com.example.slimxu.opengldemo.texture.TextureActivity;
 import com.example.slimxu.opengldemo.vao.VAOActivity;
 
@@ -45,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
             .setTargetClass(LightActivity.class));
             add(new Case().setTitle("光照材质")
             .setTargetClass(LightMaterialActivity.class));
+            add(new Case().setTitle("光照贴图")
+            .setTargetClass(LightTextureActivity.class));
         }};
 
         mAdapter = new DemoAdapter(mCaseList);
