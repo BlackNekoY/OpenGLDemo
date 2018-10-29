@@ -16,6 +16,7 @@ import com.example.slimxu.opengldemo.coordinate.CoordinateActivity;
 import com.example.slimxu.opengldemo.light.LightActivity;
 import com.example.slimxu.opengldemo.light_material.LightMaterialActivity;
 import com.example.slimxu.opengldemo.light_texture.LightTextureActivity;
+import com.example.slimxu.opengldemo.sensor_test.SensorActivity;
 import com.example.slimxu.opengldemo.texture.TextureActivity;
 import com.example.slimxu.opengldemo.vao.VAOActivity;
 
@@ -48,6 +49,8 @@ public class MainActivity extends AppCompatActivity {
             .setTargetClass(LightMaterialActivity.class));
             add(new Case().setTitle("光照贴图")
             .setTargetClass(LightTextureActivity.class));
+            add(new Case().setTitle("传感器")
+                    .setTargetClass(SensorActivity.class));
         }};
 
         mAdapter = new DemoAdapter(mCaseList);

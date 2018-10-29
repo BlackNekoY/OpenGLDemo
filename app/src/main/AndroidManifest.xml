@@ -23,6 +23,7 @@
         <activity android:name=".light.LightActivity"/>
         <activity android:name=".light_material.LightMaterialActivity"/>
         <activity android:name=".light_texture.LightTextureActivity"/>
+        <activity android:name=".sensor_test.SensorActivity"/>
     </application>
 
     <uses-feature
