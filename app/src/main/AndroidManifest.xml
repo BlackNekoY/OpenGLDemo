@@ -24,6 +24,7 @@
         <activity android:name=".light_material.LightMaterialActivity"/>
         <activity android:name=".light_texture.LightTextureActivity"/>
         <activity android:name=".sensor_test.SensorActivity"/>
+        <activity android:name=".light_direction.LightDirectionActivity"/>
     </application>
 
     <uses-feature
