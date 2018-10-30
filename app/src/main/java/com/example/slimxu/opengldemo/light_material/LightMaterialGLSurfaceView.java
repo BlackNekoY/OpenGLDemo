@@ -108,26 +108,24 @@ public class LightMaterialGLSurfaceView extends GLSurfaceView implements GLSurfa
             "in vec3 FragPos; // 片段位置（世界坐标系）; \n" +
             "uniform Material material; // 物体材质 \n" +
             "uniform Light light; \n" +
-            "uniform vec3 objectColor; \n" +
-            "uniform vec3 lightColor; \n" +
             "uniform vec3 lightPos; // 光源的位置（世界坐标系）\n" +
             "uniform vec3 viewPos; // 观察者的位置，传入摄像机位置 \n" +
             "out vec4 color; \n" +
             "void main() { \n" +
-            "   vec3 ambient = lightColor * light.ambient * material.ambient;    // 环境光照    \n" +
+            "   vec3 ambient = light.ambient * material.ambient;    // 环境光照    \n" +
 
             "   vec3 norm = normalize(Normal); \n" +
             "   vec3 lightDir = normalize(lightPos - FragPos); \n" +
             "   float diff = max(dot(norm, lightDir), 0.0f); // 散射因子 \n" +
-            "   vec3 diffuse = (lightColor * light.diffuse) * (diff * material.diffuse);    // 散射光照 \n" +
+            "   vec3 diffuse = light.diffuse * diff * material.diffuse;    // 散射光照 \n" +
 
             "   vec3 viewDir = normalize(viewPos - FragPos); // 观察向量\n" +
             "   vec3 reflectDir = reflect(-lightDir, norm);  // 反射向量\n" +
             "   float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess); \n" +
-            "   vec3 specular = (lightColor * light.specular) * (spec * material.specular); // 镜面光照\n" +
+            "   vec3 specular = light.specular * spec * material.specular; // 镜面光照\n" +
 
-            "   vec3 finalLightColor = ambient + diffuse + specular; \n" +
-            "   color = vec4(objectColor * finalLightColor  , 1.0f); \n" +
+            "   vec3 finalColor = ambient + diffuse + specular; \n" +
+            "   color = vec4(finalColor  , 1.0f); \n" +
             "} \n";
 
 
@@ -166,7 +164,7 @@ public class LightMaterialGLSurfaceView extends GLSurfaceView implements GLSurfa
     private float mLastTouchY;
 
     private Vector mObjectPos = new Vector(0f, 0f, 0f);
-    private Vector mLightPos = new Vector(1f, 0f, 3f);
+    private Vector mLightPos = new Vector(0.4f, 0.6f, 2.0f);
     private Vector mLightColor = new Vector(1, 1, 1);   // 默认光的颜色
     private Vector mLightAmbientColor = new Vector(0.2f, 0.2f, 0.2f);   // 默认光对环境色的影响
     private Vector mLightDiffuseColor = new Vector(0.5f, 0.5f, 0.5f);   // 默认光对漫反射的影响
@@ -303,17 +301,11 @@ public class LightMaterialGLSurfaceView extends GLSurfaceView implements GLSurfa
         int unifModelPointer = GLES30.glGetUniformLocation(mProgram, "model");
         int unifViewPointer = GLES30.glGetUniformLocation(mProgram, "view");
         int unifProjectionPointer = GLES30.glGetUniformLocation(mProgram, "projection");
-        int unifObjectColor = GLES30.glGetUniformLocation(mProgram, "objectColor");
-        int unifLightColor = GLES30.glGetUniformLocation(mProgram, "lightColor");
         int unifLightPos = GLES30.glGetUniformLocation(mProgram, "lightPos");
         int unifViewPos = GLES30.glGetUniformLocation(mProgram, "viewPos");
 
         // model
         Matrix.setIdentityM(mModelMatrix, 0);
-        Matrix.translateM(mModelMatrix, 0, mObjectPos.x, mObjectPos.y, mObjectPos.z);
-        Matrix.scaleM(mModelMatrix, 0, 0.9f, 0.9f, 0.9f);
-        Matrix.rotateM(mModelMatrix, 0, -45, 0, 1, 0);
-        Matrix.rotateM(mModelMatrix, 0, 45, 1, 0, 0);
         GLES30.glUniformMatrix4fv(unifModelPointer, 1, false, mModelMatrix, 0);
 
         // view
@@ -323,12 +315,6 @@ public class LightMaterialGLSurfaceView extends GLSurfaceView implements GLSurfa
         Matrix.setIdentityM(mProjectionMatrix, 0);
         Matrix.perspectiveM(mProjectionMatrix, 0, mCamera.zoom, (float)mWidth / mHeight, 0.1f, 100f);
         GLES30.glUniformMatrix4fv(unifProjectionPointer, 1, false, mProjectionMatrix, 0);
-
-        // objectColor
-        GLES30.glUniform3f(unifObjectColor, 1.0f, 0.5f, 0.31f);
-
-        // lightColor
-        GLES30.glUniform3f(unifLightColor, mLightColor.x, mLightColor.y, mLightColor.z);
 
         // lightPos
         GLES30.glUniform3f(unifLightPos, mLightPos.x, mLightPos.y, mLightPos.z);
@@ -371,8 +357,6 @@ public class LightMaterialGLSurfaceView extends GLSurfaceView implements GLSurfa
         Matrix.setIdentityM(mModelMatrix, 0);
         Matrix.translateM(mModelMatrix, 0, mLightPos.x, mLightPos.y, mLightPos.z);
         Matrix.scaleM(mModelMatrix, 0, 0.2f, 0.2f, 0.2f);
-        Matrix.rotateM(mModelMatrix, 0, 30, 0, 1, 0);
-        Matrix.rotateM(mModelMatrix, 0, 30, 1, 0, 0);
         GLES30.glUniformMatrix4fv(unifModelPointer, 1, false, mModelMatrix, 0);
 
         // view
