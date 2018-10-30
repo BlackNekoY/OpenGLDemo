@@ -52,6 +52,7 @@ public class GLCamera {
     }
 
     public float[] getViewMatrix() {
+        updateCameraVectors();
         Matrix.setIdentityM(viewMatrix, 0);
         Matrix.setLookAtM(viewMatrix, 0,
                 position.x, position.y, position.z,
@@ -114,6 +115,18 @@ public class GLCamera {
 
     public Vector getPosition() {
         return new Vector(position);
+    }
+
+    public void setPosition(Vector position) {
+        this.position = position;
+    }
+
+    public void setYaw(float yaw) {
+        this.yaw = yaw;
+    }
+
+    public void setPitch(float pitch) {
+        this.pitch = pitch;
     }
 
     /**
