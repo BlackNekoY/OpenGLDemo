@@ -117,6 +117,10 @@ public class GLCamera {
         return new Vector(position);
     }
 
+    public Vector getFront() {
+        return new Vector(front);
+    }
+
     public void setPosition(Vector position) {
         this.position = position;
     }

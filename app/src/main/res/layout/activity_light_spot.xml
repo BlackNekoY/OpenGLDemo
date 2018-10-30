@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.example.slimxu.opengldemo.light_spot.LightSpotGLSurfaceView
+        android:id="@+id/surface_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <Button
+        android:id="@+id/go_forward"
+        android:text="前进"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:onClick="goForward"/>
+
+    <Button
+        android:id="@+id/back_up"
+        android:text="后退"
+        android:layout_toRightOf="@id/go_forward"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:onClick="backUp"/>
+    <Button
+        android:id="@+id/go_left"
+        android:text="向左"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_toRightOf="@id/back_up"
+        android:onClick="goLeft"/>
+    <Button
+        android:id="@+id/go_right"
+        android:text="向右"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_toRightOf="@id/go_left"
+        android:onClick="goRight"/>
+
+    <Button
+        android:id="@+id/up"
+        android:text="向上"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/go_forward"
+        android:onClick="up"/>
+
+    <Button
+        android:id="@+id/down"
+        android:text="向下"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/go_forward"
+        android:layout_toRightOf="@id/up"
+        android:onClick="down"/>
+
+
+
+</RelativeLayout>
