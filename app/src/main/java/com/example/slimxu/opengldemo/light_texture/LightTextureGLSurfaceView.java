@@ -73,6 +73,20 @@ public class LightTextureGLSurfaceView extends GLSurfaceView implements GLSurfac
     };
     private FloatBuffer mVertexBuffer;
 
+    private final Vector[] CUBE_POSITIONS = {
+            new Vector(0.0f,  0.0f,  0.0f),
+            new Vector( 2.0f,  5.0f, -15.0f),
+            new Vector(-1.5f, -2.2f, -2.5f),
+            new Vector(-3.8f, -2.0f, -12.3f),
+            new Vector(2.4f, -0.4f, -3.5f),
+            new Vector(-1.7f,  3.0f, -7.5f),
+            new Vector(1.3f, -2.0f, -2.5f),
+            new Vector(1.5f,  2.0f, -2.5f),
+            new Vector(1.5f,  0.2f, -1.5f),
+            new Vector(-1.3f,  1.0f, -1.5f)
+    } ;
+
+
     private final String VERTEX_SHADER =
             "#version 300 es \n" +
             "uniform mat4 model; \n" +
@@ -107,6 +121,10 @@ public class LightTextureGLSurfaceView extends GLSurfaceView implements GLSurfac
             "   vec3 ambient; \n" +
             "   vec3 diffuse; \n" +
             "   vec3 specular; \n" +
+            //  用于计算衰减的常量
+            "   float constant; // 常数项 \n" +
+            "   float linear;   // 一次项 \n" +
+            "   float quadratic; // 二次项 \n" +
             "}; \n" +
 
             "in vec3 Normal; // 法向量\n" +
@@ -132,9 +150,14 @@ public class LightTextureGLSurfaceView extends GLSurfaceView implements GLSurfac
             "   float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess); \n" +
             "   vec3 specular = light.specular * materialSpecular * spec; // 镜面光照\n" +
 
-//            "   vec3 emission = vec3(texture(material.emission, TexPos)); \n" +
+            "   vec3 emission = vec3(texture(material.emission, TexPos)); \n" +
 
-            "   vec3 finalColor = ambient + diffuse + specular /*+ emission*/; \n" +
+            //  计算衰减值
+            "   float distance = length(light.position - FragPos); // 光源到片段的距离 \n" +
+            "   float attenuation = 1.0f / (light.constant + light.linear * distance + light.quadratic * distance * distance); \n" +
+
+            "   vec3 finalColor = (ambient + diffuse + specular /*+ emission*/) * attenuation; \n" +
+
             "   color = vec4(finalColor , 1.0f); \n" +
             "} \n";
 
@@ -345,10 +368,6 @@ public class LightTextureGLSurfaceView extends GLSurfaceView implements GLSurfac
         int unifProjectionPointer = GLES30.glGetUniformLocation(mProgram, "projection");
         int unifViewPos = GLES30.glGetUniformLocation(mProgram, "viewPos");
 
-        // model
-        Matrix.setIdentityM(mModelMatrix, 0);
-        GLES30.glUniformMatrix4fv(unifModelPointer, 1, false, mModelMatrix, 0);
-
         // view
         GLES30.glUniformMatrix4fv(unifViewPointer, 1, false, mCamera.getViewMatrix(), 0);
 
@@ -384,10 +403,20 @@ public class LightTextureGLSurfaceView extends GLSurfaceView implements GLSurfac
                 mLightSpeclarColor.x, mLightSpeclarColor.y, mLightSpeclarColor.z);
         GLES30.glUniform3f(GLES30.glGetUniformLocation(mProgram, "light.position"),
                 mLightPos.x, mLightPos.y, mLightPos.z);
+        GLES30.glUniform1f(GLES30.glGetUniformLocation(mProgram, "light.constant "), 1.0f);
+        GLES30.glUniform1f(GLES30.glGetUniformLocation(mProgram, "light.linear"), 0.09f);
+        GLES30.glUniform1f(GLES30.glGetUniformLocation(mProgram, "light.quadratic"), 0.032f);
 
 
         GLES30.glBindVertexArray(mObjVAO);
-        GLES30.glDrawArrays(GLES30.GL_TRIANGLES, 0, 36);
+        for (int i = 0;i < CUBE_POSITIONS.length; i++) {
+            // model
+            Matrix.setIdentityM(mModelMatrix, 0);
+            Matrix.translateM(mModelMatrix, 0, CUBE_POSITIONS[i].x, CUBE_POSITIONS[i].y, CUBE_POSITIONS[i].z);
+            Matrix.rotateM(mModelMatrix, 0, i * 20f, 1f, 0.3f, 0.5f);
+            GLES30.glUniformMatrix4fv(unifModelPointer, 1, false, mModelMatrix, 0);
+            GLES30.glDrawArrays(GLES30.GL_TRIANGLES, 0, 36);
+        }
         GLES30.glBindVertexArray(0);
 
         // 切换到lightProgram画光源

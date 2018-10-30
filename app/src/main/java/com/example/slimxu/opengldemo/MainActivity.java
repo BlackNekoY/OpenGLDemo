@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
             .setTargetClass(LightActivity.class));
             add(new Case().setTitle("光照材质")
             .setTargetClass(LightMaterialActivity.class));
-            add(new Case().setTitle("光照贴图")
+            add(new Case().setTitle("光照贴图 & 点光源（衰减）")
             .setTargetClass(LightTextureActivity.class));
             add(new Case().setTitle("定向光")
             .setTargetClass(LightDirectionActivity.class));
