@@ -39,4 +39,12 @@ public class CameraActivity extends AppCompatActivity {
     public void goRight(View view) {
         mGLSurfaceView.mCamera.processKeyboardMovement(GLCamera.Direction.RIGHT, 0.5f);
     }
+
+    public void up (View view) {
+        mGLSurfaceView.mCamera.processKeyboardMovement(GLCamera.Direction.UP, 0.5f);
+    }
+
+    public void down (View view) {
+        mGLSurfaceView.mCamera.processKeyboardMovement(GLCamera.Direction.DOWN, 0.5f);
+    }
 }

@@ -93,12 +93,12 @@ public class GLCamera {
             position.y -= front.y * offset;
             position.z -= front.z * offset;
         } else if(direction == Direction.LEFT) {
-            Vector crossVector = Vector.cross(front, up);
+            Vector crossVector = Vector.normalize(Vector.cross(front, up));
             position.x -= crossVector.x * offset;
             position.y -= crossVector.y * offset;
             position.z -= crossVector.z * offset;
         } else if(direction == Direction.RIGHT) {
-            Vector crossVector = Vector.cross(front, up);
+            Vector crossVector = Vector.normalize(Vector.cross(front, up));
             position.x += crossVector.x * offset;
             position.y += crossVector.y * offset;
             position.z += crossVector.z * offset;
@@ -142,7 +142,8 @@ public class GLCamera {
         front.x = (float) (Math.cos(yawRadians) * Math.cos(pitchRadians));
         front.y = (float) Math.sin(pitchRadians);
         front.z = (float) (Math.sin(yawRadians) * Math.cos(pitchRadians));
-        right = Vector.cross(front, worldUp);
-        up = Vector.cross(right, front);
+        front = Vector.normalize(front);
+        right = Vector.normalize(Vector.cross(front, worldUp));
+        up = Vector.normalize(Vector.cross(right, front));
     }
 }

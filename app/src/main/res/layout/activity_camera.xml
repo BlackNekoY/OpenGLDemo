@@ -44,5 +44,22 @@
         android:layout_toRightOf="@id/go_left"
         android:onClick="goRight"/>
 
+    <Button
+        android:id="@+id/up"
+        android:text="向上"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/go_forward"
+        android:onClick="up"/>
+
+    <Button
+        android:id="@+id/down"
+        android:text="向下"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/go_forward"
+        android:layout_toRightOf="@id/up"
+        android:onClick="down"/>
+
 
 </RelativeLayout>

@@ -33,6 +33,14 @@ public class Vector {
         return new Vector(x, y, z);
     }
 
+    /**
+     * 标准化向量
+     */
+    public static Vector normalize(Vector v) {
+        double length = Math.sqrt(v.x * v.x + v.y * v.y + v.z * v.z);   // 向量的模
+        return new Vector(v.x / (float)length, v.y / (float)length, v.z / (float)length);
+    }
+
 //
 //    public Vector multiply(float value) {
 //        Vector vector = new Vector(this);
