@@ -117,10 +117,11 @@ public class LightSpotGLSurfaceView extends GLSurfaceView implements GLSurfaceVi
             "}; \n" +
             //
             "struct Light { \n" +
-                // 聚光光源需要三个要素：位置、方向、切光角
+                // 聚光光源需要四个要素：位置、方向、切光角、外层切光角。做（平滑/软化边缘）
             "   vec3 position; \n" +
             "   vec3 direction; \n" +
             "   float cutOff;   \n" +
+            "   float outCutOff; \n" +
 
             "   vec3 ambient; \n" +
             "   vec3 diffuse; \n" +
@@ -139,39 +140,37 @@ public class LightSpotGLSurfaceView extends GLSurfaceView implements GLSurfaceVi
             "uniform vec3 viewPos; // 观察者的位置，传入摄像机位置 \n" +
             "out vec4 color; \n" +
             "void main() { \n" +
-            "   float theta = dot(normalize(FragPos - light.position), normalize(light.direction)); \n" +
+            "   float theta = dot(normalize(FragPos - light.position), normalize(light.direction)); \n" +   // 当前角度的cos值
+            "   float value = (theta - light.outCutOff) / (light.cutOff - light.outCutOff); \n" +   // 让在 cutOff 与 outCutOff之间的光亮度，平滑渐变 由1.0 ~ 0.0
+            "   float intensity = clamp(value, 0.0f, 1.0f); \n" +
+
             "   vec3 materialDiffuse = vec3(texture(material.diffuse, TexPos)); // 贴图颜色就为物体颜色\n" +
             "   vec3 materialSpecular = vec3(texture(material.specular, TexPos)); //  镜面高光颜色 \n" +
 
-            "   if (theta > light.cutOff) { \n" +
-                    // 在切光角内的片段，会被照亮，正常计算光照
-            "       vec3 ambient = light.ambient * materialDiffuse;    // 环境光照    \n" +
+            "   vec3 ambient = light.ambient * materialDiffuse;    // 环境光照    \n" +
 
-            "       vec3 norm = normalize(Normal); \n" +
-            "       vec3 lightDir = normalize(light.position - FragPos); \n" +
-            "       float diff = max(dot(norm, lightDir), 0.0f); // 散射因子 \n" +
-            "       vec3 diffuse = light.diffuse * materialDiffuse * diff;    // 散射光照 \n" +
+            "   vec3 norm = normalize(Normal); \n" +
+            "   vec3 lightDir = normalize(light.position - FragPos); \n" +
+            "   float diff = max(dot(norm, lightDir), 0.0f); // 散射因子 \n" +
+            "   vec3 diffuse = light.diffuse * materialDiffuse * diff;    // 散射光照 \n" +
 
-            "       vec3 viewDir = normalize(viewPos - FragPos); // 观察向量\n" +
-            "       vec3 reflectDir = reflect(-lightDir, norm);  // 反射向量\n" +
-            "       float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess); \n" +
-            "       vec3 specular = light.specular * materialSpecular * spec; // 镜面光照\n" +
+            "   vec3 viewDir = normalize(viewPos - FragPos); // 观察向量\n" +
+            "   vec3 reflectDir = reflect(-lightDir, norm);  // 反射向量\n" +
+            "   float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess); \n" +
+            "   vec3 specular = light.specular * materialSpecular * spec; // 镜面光照\n" +
 
-            "       vec3 emission = vec3(texture(material.emission, TexPos)); \n" +
+            "   vec3 emission = vec3(texture(material.emission, TexPos)); \n" +
 
-            //      计算衰减值
-            "       float distance = length(light.position - FragPos); // 光源到片段的距离 \n" +
-            "       float attenuation = 1.0f / (light.constant + light.linear * distance + light.quadratic * distance * distance); \n" +
-//            "       ambient *= attenuation; \n" +
-            "       diffuse *= attenuation; \n" +
-            "       specular *= attenuation; \n" +
+            //  计算衰减值
+            "   float distance = length(light.position - FragPos); // 光源到片段的距离 \n" +
+            "   float attenuation = 1.0f / (light.constant + light.linear * distance + light.quadratic * distance * distance); \n" +
 
-            "       vec3 finalColor = ambient + diffuse + specular /*+ emission*/; \n" +
-            "       color = vec4(finalColor , 1.0f); \n" +
-            "   } else { \n" +
-                    // 切光角外的片段，只有环境光照
-            "       color = vec4(materialDiffuse * light.ambient, 1.0f); \n" +
-            "   } \n" +
+//            "   ambient *= attenuation; \n" +     // 衰减 和 亮度渐变值，都不影响环境色，不然就一片漆黑了
+            "   diffuse = diffuse * attenuation * intensity; \n" +
+            "   specular = specular * attenuation * intensity; \n" +
+
+            "   vec3 finalColor = ambient + diffuse + specular /*+ emission*/; \n" +
+            "   color = vec4(finalColor , 1.0f); \n" +
             "} \n";
 
 
@@ -423,6 +422,8 @@ public class LightSpotGLSurfaceView extends GLSurfaceView implements GLSurfaceVi
         GLES30.glUniform3f(GLES30.glGetUniformLocation(mProgram, "light.direction"),
                 front.x, front.y, front.z);
         GLES30.glUniform1f(GLES30.glGetUniformLocation(mProgram, "light.cutOff"),
+                (float) Math.cos(Math.toRadians(5)));
+        GLES30.glUniform1f(GLES30.glGetUniformLocation(mProgram, "light.outCutOff"),
                 (float) Math.cos(Math.toRadians(10)));
 
         // 光源特性（衰减的3个常量）
