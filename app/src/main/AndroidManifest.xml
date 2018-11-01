@@ -26,6 +26,7 @@
         <activity android:name=".sensor_test.SensorActivity"/>
         <activity android:name=".light_direction.LightDirectionActivity"/>
         <activity android:name=".light_spot.LightSpotActivity"/>
+        <activity android:name=".light_multiply.LightMultiplyActivity"/>
     </application>
 
     <uses-feature

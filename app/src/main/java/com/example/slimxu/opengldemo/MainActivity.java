@@ -16,6 +16,7 @@ import com.example.slimxu.opengldemo.coordinate.CoordinateActivity;
 import com.example.slimxu.opengldemo.light.LightActivity;
 import com.example.slimxu.opengldemo.light_direction.LightDirectionActivity;
 import com.example.slimxu.opengldemo.light_material.LightMaterialActivity;
+import com.example.slimxu.opengldemo.light_multiply.LightMultiplyActivity;
 import com.example.slimxu.opengldemo.light_spot.LightSpotActivity;
 import com.example.slimxu.opengldemo.light_texture.LightTextureActivity;
 import com.example.slimxu.opengldemo.sensor_test.SensorActivity;
@@ -55,6 +56,8 @@ public class MainActivity extends AppCompatActivity {
             .setTargetClass(LightDirectionActivity.class));
             add(new Case().setTitle("聚光（手电筒）")
             .setTargetClass(LightSpotActivity.class));
+            add(new Case().setTitle("多光源")
+            .setTargetClass(LightMultiplyActivity.class));
             add(new Case().setTitle("传感器")
                     .setTargetClass(SensorActivity.class));
         }};
