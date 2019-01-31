@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.example.slimxu.opengldemo.camera.CameraActivity;
 import com.example.slimxu.opengldemo.coordinate.CoordinateActivity;
+import com.example.slimxu.opengldemo.egl_window.EGLWindowActivity;
 import com.example.slimxu.opengldemo.light.LightActivity;
 import com.example.slimxu.opengldemo.light_direction.LightDirectionActivity;
 import com.example.slimxu.opengldemo.light_material.LightMaterialActivity;
@@ -60,6 +61,8 @@ public class MainActivity extends AppCompatActivity {
             .setTargetClass(LightMultiplyActivity.class));
             add(new Case().setTitle("传感器")
                     .setTargetClass(SensorActivity.class));
+            add(new Case().setTitle("EGL环境上屏渲染")
+                    .setTargetClass(EGLWindowActivity.class));
         }};
 
         mAdapter = new DemoAdapter(mCaseList);

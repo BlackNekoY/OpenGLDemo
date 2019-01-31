@@ -27,6 +27,7 @@
         <activity android:name=".light_direction.LightDirectionActivity"/>
         <activity android:name=".light_spot.LightSpotActivity"/>
         <activity android:name=".light_multiply.LightMultiplyActivity"/>
+        <activity android:name=".egl_window.EGLWindowActivity"/>
     </application>
 
     <uses-feature
