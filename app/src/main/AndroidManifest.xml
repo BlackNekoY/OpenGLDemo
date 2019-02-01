@@ -28,6 +28,7 @@
         <activity android:name=".light_spot.LightSpotActivity"/>
         <activity android:name=".light_multiply.LightMultiplyActivity"/>
         <activity android:name=".egl_window.EGLWindowActivity"/>
+        <activity android:name=".egl_offscreen.EGLOffScreenActivity"/>
     </application>
 
     <uses-feature
