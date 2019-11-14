@@ -48,6 +48,9 @@ public class GLUtil {
         return floatBuffer;
     }
 
-
-
+    public static void checkProgram(int program) {
+        if (program == -1) {
+            throw new RuntimeException("program is -1");
+        }
+    }
 }

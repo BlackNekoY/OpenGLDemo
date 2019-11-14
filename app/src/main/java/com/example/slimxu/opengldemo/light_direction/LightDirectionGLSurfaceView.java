@@ -18,7 +18,6 @@ import com.example.slimxu.opengldemo.GLUtil;
 import com.example.slimxu.opengldemo.R;
 import com.example.slimxu.opengldemo.Vector;
 
-import junit.framework.Assert;
 
 import java.nio.FloatBuffer;
 
@@ -165,6 +164,7 @@ public class LightDirectionGLSurfaceView extends GLSurfaceView implements GLSurf
                     "} \n";
     private final String LIGHT_FRAGMENT_SHADER =
             "#version 300 es \n" +
+                    "precision mediump float; \n" +
                     "out vec4 color; \n" +
                     "void main() { \n" +
                     "   color = vec4(1.0f); \n" +
@@ -458,7 +458,7 @@ public class LightDirectionGLSurfaceView extends GLSurfaceView implements GLSurf
     }
 
     private void checkProgram() {
-        Assert.assertTrue(mProgram != -1);
-        Assert.assertTrue(mLightProgram != -1);
+        GLUtil.checkProgram(mProgram);
+        GLUtil.checkProgram(mLightProgram);
     }
 }
